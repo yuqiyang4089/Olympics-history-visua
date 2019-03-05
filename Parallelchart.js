@@ -15,9 +15,9 @@ var line = d3.line(),
     foreground;
 var sex = d3.scaleOrdinal().domain(["M","F"]).range([0,1]);
 
-var medal = d3.scaleOrdinal().domain(["Gold","Silver","Bronze"]).range([0,1,2]);
+var medal = d3.scaleOrdinal().domain(["Gold","Silver","Bronze","perfect"]).range([0,1,2,3]);
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("body").append("svg").attr("class","parallelchart")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
@@ -32,12 +32,12 @@ d3.csv("./data/parallel_non-NA.csv", function(error, data) {
      })
   // Extract the list of dimensions and create a scale for each.
   x.domain(dimensions = d3.keys(data[0]).filter(function(d) {
-    return d != "ID" && d!="Sport" && d.Medal !=3 &&(y[d] = d3.scaleLinear() 
+    return d != "ID" && d!="Sport" &&(y[d] = d3.scaleLinear() 
         .domain(d3.extent(data, function(p) { return +p[d]; }))
         .range([height, 0]));
   })); 
   mydata = data.filter(function(d){return d.Sex==1 && d.Year==2016 && d.Medal==0&& d.Sport=="Basketball"})
- console.log(mydata)
+
   // Add grey background lines for context.
   background = svg.append("g")
       .attr("class", "background")
@@ -86,14 +86,75 @@ d3.csv("./data/parallel_non-NA.csv", function(error, data) {
         }));
 
   // Add an axis and title.
+  var text_sex = (["F","M"]);
+  var text_medal=(["Gold","Silver","Bronze","perfect"]);
+  
   g.append("g")
       .attr("class", "axis")
-      .each(function(d) { d3.select(this).call(axis.scale(y[d])); })
-    .append("text")
+      .each(function(d,i) {
+        if (i==0) {
+           d3.select(this).call(d3.axisLeft(y[d]).ticks(1));
+          d3.select(this)
+          .append("g")
+          .selectAll("text")
+          .data(text_sex)
+          .enter()
+          .append("text")
+          .style("opacity", 1)
+          .text(function(p){
+            return p;
+          })
+          .attr("transform", function(p,i){
+            if (i == 0 ) {
+              return "translate(0, 0.5)";
+            } else {
+              return "translate(0,460.5)";
+            }
+          })
+          ;
+        }else if (i==4) {
+          d3.select(this).call(d3.axisLeft(y[d]).ticks(26));
+        } 
+        else if (i==5) {
+           d3.select(this).call(d3.axisLeft(y[d]).ticks(3));
+           d3.select(this)
+          .append("g")
+          .selectAll("text")
+          .data(text_medal)
+          .enter()
+          .append("text")
+          .style("opacity", 1)
+          .text(function(p){
+            return p;
+          })
+          .attr("transform", function(p,i){
+            if (i == 0 ) {
+              return "translate(0, 460.5)";
+            } else if(i==1) {
+              return "translate(0,307.166)";
+            }else if (i==2) {
+              return "translate(0,153.833)";
+            }
+            else{
+               return "translate(0,0.5)";
+            }
+          })
+          ;
+        } else {
+           d3.select(this).call(d3.axisLeft(y[d]));
+        };
+       
+        d3.select(this).attr("id",function(d){return d});
+       })
+      .append("text")
       .style("text-anchor", "middle")
       .attr("y", -9)
       .text(function(d) { return d; });
-
+// d3.select("#Sex").selectAll(".tick")
+//        .append("text")
+//        .style("text-anchor", "middle")
+//        .attr("y", -9)
+//        .text(function(d){return text_sex})
   // Add and store a brush for each axis.
   g.append("g")
       .attr("class", "brush")
@@ -104,6 +165,7 @@ d3.csv("./data/parallel_non-NA.csv", function(error, data) {
       .attr("x", -8)
       .attr("width", 16);
 });
+d3.s
 
 
 function position(d) {
