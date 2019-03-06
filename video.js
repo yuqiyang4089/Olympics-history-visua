@@ -1,10 +1,20 @@
 var width = 1180;
-var height = 5800;
+//var height = 5800;
+var height = 320;
+var margin = 40;
 var x = d3.scaleLinear().range([0, width]);
-var y = d3.scaleLinear().range([height, 0]).domain([0,5200]);
-
-var drawVideo = function(name, season){
-    // load data with queue
+var y = d3.scaleLinear().range([height-margin, 0]).domain([0,(height-margin)]);
+var cname = "USA";
+var sname = "Football";
+var drawVideo = function(name, sport){
+  
+  if (name!="") {
+    cname = name;
+  };
+  if (sport!="") {
+    sname = sport;
+  }
+  // load data with queue
   var url1 = "./data/newcareertime.csv";
   var url2 = "./data/newnames.csv"; //the dataset only draw a link when # of medals is lager than 10
 
@@ -21,17 +31,19 @@ var drawVideo = function(name, season){
     var svg = d3.select("body").append("svg")
         .attr("id", "video")
         .attr("width", "100%")
-        .attr("height", "6000px");
+        .attr("height", height)
+        ;
 
   
-    
+    console.log(cname);
+    console.log(sname);
     // Format the data
     data[0].forEach(function(d) {
       d.Year = +d.Year;
     });
     // Filter the data
     data[0] = data[0].filter(function(d){
-      return d.NOC===name;
+      return d.NOC===cname;
     });
     var mytime = d3.extent(data[0], function(d) { return d.Year; });
 
@@ -40,11 +52,11 @@ var drawVideo = function(name, season){
     // data[0] = data[0].filter(function(d){
     //   return d.Year===year;
     // });
-    data[0] = data[0].filter(function(d){
-      return d.Season===season;
-    });
+    // data[0] = data[0].filter(function(d){
+    //   return d.Season===season;
+    // });
     data[1] = data[1].filter(function(d){
-      return d.NOC===name;
+      return d.NOC===cname;
     });
     
 
@@ -115,9 +127,10 @@ var drawVideo = function(name, season){
     // set the ranges
     
     // draw points function
-    var draw = function(group1, group2, t){
+    var interv = height - margin;
+    var draw = function(group1, group2){
       var me = svg.append("g").attr("class", "liandci")
-                  .attr("transform", "translate(60" + ", 100" + ")")
+                  .attr("transform", "translate(60" + ", 20" + ")")
                   ;
       me.selectAll(".licircle")
         .data(group1)
@@ -142,9 +155,9 @@ var drawVideo = function(name, season){
           return x(d.Year);
         })
         .attr("cy", function(d) {
-          return y(d.newid/group1.length*100 + 100*t);
+          return y(d.newid/group1.length*interv);
         })
-        .style("fill", "black")
+        .style("fill", "white")
         .style("opacity", 0)
         // .on('mouseover', function (d){
         //   newX =  parseFloat(d3.select(this).attr('cx')) + 10;
@@ -174,7 +187,7 @@ var drawVideo = function(name, season){
           //var theid = d3.select("#" + d.Sport + d.ID + d.years[0]).attr("newid");
           //var theid = 1;
           var theid = d3.select(".licircle" + d.ID).attr("newid");
-          return y(theid/group1.length*100 + 100*t);
+          return y(theid/group1.length*interv);
         })
         // .attr("x2", function(d){
         //   return x(d.years[d.years.length-1]);
@@ -186,28 +199,32 @@ var drawVideo = function(name, season){
           //var theid = d3.select("#" + d.ID + d.years[0] + d.Sport).attr("newid");
           //var theid = 1;
           var theid = d3.select(".licircle" + d.ID).attr("newid");
-          return y(theid/group1.length*100 + 100*t);
+          return y(theid/group1.length*interv );
         })
-        .attr("stroke", "black")
+        .attr("stroke", "white")
         .attr("stroke-width", "1px");
     };
 
     for (var i = 0; i<sumsport.length; i++){
-      draw(summer[0][i], summer[1][i], i);
+      if (sumsport[i]==sname) {
+        draw(summer[0][i], summer[1][i]);
+      }   
     };
 
     // Add the X Axis
     var newtemp = (mytime[1] - mytime[0])/4;
     svg.append("g")
-      .attr("transform", "translate(60," + 5900 + ")")
-      .call(d3.axisBottom(x)
-        .tickFormat(d3.format(".4r")).ticks(newtemp));
+      .attr("class", "axis")
+      .attr("transform", "translate(60," + (height-20) + ")")
+      .call(
+        d3.axisBottom(x).tickFormat(d3.format(".4r")).ticks(newtemp)
+      );
 
     // Add the Y Axis
     svg.append("g")
-      .attr('class', 'y axis')
-      .attr("transform", "translate(60" + ", 100" + ")")
-      .call(d3.axisLeft(y).ticks(52))
+      .attr('class', 'axis')
+      .attr("transform", "translate(60" + ", 20" + ")")
+      .call(d3.axisLeft(y))
 
       ;
   
@@ -236,15 +253,15 @@ function dotheupdate(year) {
   });
 }
 
-function drawCareer(name, season) {
-  drawVideo(name, season);
+function drawCareer(name, sport) {
+  drawVideo(name, sport);
   var upyear = 1896;
   if(upyear<=2016) {
               dataUpdatingInterval = setInterval(function() {
                   dotheupdate(upyear);
                   upyear = upyear + 2;
-              }, 700);
+              }, 500);
           } else {
-              clearInterval(window.dataUpdatingInterval);
+              clearInterval(dataUpdatingInterval);
           };
 }
