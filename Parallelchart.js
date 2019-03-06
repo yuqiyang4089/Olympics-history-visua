@@ -1,5 +1,17 @@
-//var drawParallelchart = function(sporttname){
-var sporttname = "Basketball"
+
+
+var Sport = "Swimming"
+var Nname = "USA"
+var drawParallelchart = function(sporttname,nation){
+ if(sporttname != ""){
+    Sport = sporttname
+ } 
+ if(nation !=""){
+     Nname = nation
+ }
+ 
+console.log(Sport)
+console.log(Nname)
 
 var margin = {top: 30, right: 10, bottom: 10, left: 10},
     width = 1260 - margin.left - margin.right,
@@ -24,7 +36,7 @@ var svg = d3.select("body").append("svg").attr("class","parallelchart")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 d3.csv("./data/parallel_non-NA.csv", function(error, data) {
-  data= data.filter(function(d){return d.Sport == sporttname && d.Medal!="NA"})
+  data= data.filter(function(d){return d.Sport == Sport && d.Medal!="NA"})
    
     data.forEach(function(d){
       d.Sex = sex(d.Sex)
@@ -32,11 +44,11 @@ d3.csv("./data/parallel_non-NA.csv", function(error, data) {
      })
   // Extract the list of dimensions and create a scale for each.
   x.domain(dimensions = d3.keys(data[0]).filter(function(d) {
-    return d != "ID" && d!="Sport" &&(y[d] = d3.scaleLinear() 
+    return d != "ID" && d!="Sport" && d!="NOC" &&(y[d] = d3.scaleLinear() 
         .domain(d3.extent(data, function(p) { return +p[d]; }))
         .range([height, 0]));
   })); 
-  mydata = data.filter(function(d){return d.Sex==1 && d.Year==2016 && d.Medal==0&& d.Sport=="Basketball"})
+  mydata = data.filter(function(d){return d.Sex==1 && d.Year==2016 && d.Medal==0&& d.Sport==Sport})
 
   // Add grey background lines for context.
   background = svg.append("g")
@@ -51,8 +63,23 @@ d3.csv("./data/parallel_non-NA.csv", function(error, data) {
       .attr("class", "foreground")
     .selectAll("path")
       .data(data)
-    .enter().append("path")
-      .attr("d", path);
+    .enter()
+    .append("path")
+      .attr("d", path)
+      .attr("stroke", function(d){
+        if (d.NOC==Nname) {
+          return "#218868";
+        } else if (d.NOC=="AAA") {
+          return "red";
+        } else {
+          return "white";
+        }
+      })
+      .style("opacity",function(d){
+        if (d.NOC!=Nname&&d.NOC!="AAA"){
+          return 0.05;
+        }
+      });
 
   // Add a group element for each dimension.
   var g = svg.selectAll(".dimension")
@@ -208,8 +235,9 @@ function brush() {
       return active.extent[0] <= y[dim](d[dim]) && y[dim](d[dim]) <= active.extent[1];
     }) ? null : 'none';
   });
-}    
-
+ } 
+}
+ drawParallelchart("","");
 // function brush() {
 //   var actives = dimensions.filter(function(p) { return d3.brushSelection(y[p]) !== null;}),
 //       extents = actives.map(function(p) { return y[p].brush.extent(); });
