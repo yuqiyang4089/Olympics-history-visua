@@ -1,7 +1,6 @@
 
-
-var Sport = "Football";
-var Nname = "USA";
+var Sport = "Swimming"
+var Nname = "CHN"
 var drawParallelchart = function(sporttname,nation){
  if(sporttname != ""){
     Sport = sporttname
@@ -15,7 +14,7 @@ console.log(Nname)
 
 var margin = {top: 30, right: 10, bottom: 10, left: 10},
     width = 1260 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    height = 300 - margin.top - margin.bottom;
 
 var x = d3.scalePoint().rangeRound([0, width]). padding(1),
     y = {},
@@ -25,32 +24,48 @@ var line = d3.line(),
     axis = d3.axisLeft(x),
     background,
     foreground;
-var sex = d3.scaleOrdinal().domain(["M","F"]).range([0,1]);
+var sex = d3.scaleOrdinal().domain(["F"]).range([0.5]);
 
-var medal = d3.scaleOrdinal().domain(["Gold","Silver","Bronze","perfect"]).range([0,1,2,3]);
+var medal = d3.scaleOrdinal().domain(["Gold","Silver","Bronze","NA","perfect"]).range([0,1,2,3,4]);
 
-//d3.select(".parallelchart").remove();
+
+
+
+
 var svg = d3.select("body").append("svg").attr("class","parallelchart")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    ;
 
 d3.csv("./data/parallel_non-NA.csv", function(error, data) {
-  data= data.filter(function(d){return d.Sport == Sport && d.Medal!="NA"})
+  data= data.filter(function(d){return (d.Sport == Sport &&d.NOC ==Nname&&d.Sex=="F" )||(d.Sport == Sport &&d.NOC =="AAA"&&d.Sex=="F")})
    
     data.forEach(function(d){
       d.Sex = sex(d.Sex)
+
       d.Medal = medal(d.Medal);
      })
   // Extract the list of dimensions and create a scale for each.
   x.domain(dimensions = d3.keys(data[0]).filter(function(d) {
-    return d != "ID" && d!="Sport" && d!="NOC" &&(y[d] = d3.scaleLinear() 
+     if(d==="ID") return false;
+     if(d==="Sport") return false;
+     if(d==="NOC") return false;
+     if(d==="Sex") {
+       y[d] = d3.scaleLinear().domain([0,1]).range([height,0]);
+     }
+     else{
+       y[d] = d3.scaleLinear() 
         .domain(d3.extent(data, function(p) { return +p[d]; }))
-        .range([height, 0]));
-  })); 
-  mydata = data.filter(function(d){return d.Sex==1 && d.Year==2016 && d.Medal==0&& d.Sport==Sport})
+        .range([height, 0])
 
+     }
+
+      return true;
+
+  })); 
+  
   // Add grey background lines for context.
   background = svg.append("g")
       .attr("class", "background")
@@ -59,26 +74,40 @@ d3.csv("./data/parallel_non-NA.csv", function(error, data) {
     .enter().append("path")
       .attr("d", path);
 
+
   // Add blue foreground lines for focus.
   foreground = svg.append("g")
       .attr("class", "foreground")
     .selectAll("path")
       .data(data)
     .enter()
-    .append("path")
+    .append("path").attr("class", function(d){
+    	return "ath-" +d.ID+ " year-"+d.Year
+    })
       .attr("d", path)
-      .attr("stroke", function(d){
-        if (d.NOC==Nname) {
-          return "#218868";
-        } else if (d.NOC=="AAA") {
-          return "red";
-        } else {
-          return "white";
+      .attr("stroke-width", function(d){
+        if (d.NOC=="AAA") {
+          return "1px";
         }
       })
-      .style("opacity",function(d){
-        if (d.NOC!=Nname&&d.NOC!="AAA"){
-          return 0.05;
+      .attr("stroke", function(d){
+        if (d.Medal==0){
+        	return "yellow";
+        }
+        else if (d.Medal==1){
+        	return "red";
+        }
+        else if (d.Medal==2){
+        	return "blue"
+        }
+        else if(d.Medal ==3) {
+        	return "gray"
+        }else{
+        	return "white" 
+        }})
+      .attr("opacity",function(d){
+        if (d.Medal ==3){
+          return 0.1
         }
       });
 
@@ -112,16 +141,29 @@ d3.csv("./data/parallel_non-NA.csv", function(error, data) {
               .duration(0)
               .attr("visibility", null);
         }));
+// // ============修改============================
+// var title = svg.append("text")
+//   // .attr("x", 50)
+//   // .attr("y", 0)
+//   .attr("transform", "translate(50,0) rotate(360)")
+//   //.attr("transform", "rotate(180)")
+//   .attr("id", "title")
+//   .attr("font-size", 25)
+//   .attr("style", "fill: lightgreen; writing-mode: tb")
+//   .text(function(d){return "Physical Qualities of " + Sport + " in "+Nname });
+ 
+
+
 
   // Add an axis and title.
-  var text_sex = (["F","M"]);
-  var text_medal=(["Gold","Silver","Bronze","perfect"]);
+  var text_sex = (["F"]);
+  var text_medal=(["Gold","Silver","Bronze","NA","perfect"]);
   
   g.append("g")
       .attr("class", "axis")
       .each(function(d,i) {
         if (i==0) {
-           d3.select(this).call(d3.axisLeft(y[d]).ticks(1));
+           d3.select(this).call(d3.axisLeft(y[d]).ticks(0));
           d3.select(this)
           .append("g")
           .selectAll("text")
@@ -134,9 +176,7 @@ d3.csv("./data/parallel_non-NA.csv", function(error, data) {
           })
           .attr("transform", function(p,i){
             if (i == 0 ) {
-              return "translate(0, 0.5)";
-            } else {
-              return "translate(0,460.5)";
+              return "translate(0, 130.5)";
             }
           })
           ;
@@ -144,7 +184,7 @@ d3.csv("./data/parallel_non-NA.csv", function(error, data) {
           d3.select(this).call(d3.axisLeft(y[d]).ticks(26));
         } 
         else if (i==5) {
-           d3.select(this).call(d3.axisLeft(y[d]).ticks(3));
+           d3.select(this).call(d3.axisLeft(y[d]).ticks(4));
            d3.select(this)
           .append("g")
           .selectAll("text")
@@ -157,11 +197,15 @@ d3.csv("./data/parallel_non-NA.csv", function(error, data) {
           })
           .attr("transform", function(p,i){
             if (i == 0 ) {
-              return "translate(0, 460.5)";
+              return "translate(0, 260.5)";
             } else if(i==1) {
-              return "translate(0,307.166)";
-            }else if (i==2) {
-              return "translate(0,153.833)";
+              return "translate(0,195.5)";
+            }else if(i==2){
+              return "translate(0,130.5)"
+
+            }
+            else if (i==3) {
+              return "translate(0,65.5)";
             }
             else{
                return "translate(0,0.5)";
@@ -230,12 +274,49 @@ function brush() {
         extent: d3.brushSelection(this)
       });
     });
+        console.log(actives);
   // set un-brushed foreground line disappear
   foreground.style('display', function(d) {
     return actives.every(function(active) {
       const dim = active.dimension;
       return active.extent[0] <= y[dim](d[dim]) && y[dim](d[dim]) <= active.extent[1];
     }) ? null : 'none';
-  });
+  })
+  	.classed("actpath", function(d){
+  		return actives.every(function(active) {
+	      const dim = active.dimension;
+	      return active.extent[0] <= y[dim](d[dim]) && y[dim](d[dim]) <= active.extent[1];
+	    }) ? true : false;
+  	})
+	.style("display",function(d){
+	  if(d.NOC!="AAA"){
+	    return "null";
+	  }
+	})
+  ;
+
+  d3.selectAll(".actpath").each(function(d){
+  	d3.select(".videoci-"+d.ID).select(".videoy-"+d.Year).attr("fill", "red");
+  })
  } 
+
+
+
+
+
+
+
+
+
 }
+ drawParallelchart("","");
+// function brush() {
+//   var actives = dimensions.filter(function(p) { return d3.brushSelection(y[p]) !== null;}),
+//       extents = actives.map(function(p) { return y[p].brush.extent(); });
+//   foreground.style("display", function(d) {
+//     return actives.every(function(p, i) {
+//       return extents[i][0] <= d[p] && d[p] <= extents[i][1];
+//     }) ? null : "none";
+//   });
+// }
+//}
