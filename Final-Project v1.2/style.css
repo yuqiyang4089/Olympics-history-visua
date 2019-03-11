@@ -1,0 +1,181 @@
+body, html {
+  width: 100%;
+  height: 100%;
+  background-color: #383838;
+}
+ul,li {
+ margin:0px;
+ padding:0px;
+}
+text {
+  fill: white;
+  stroke: none;
+/*  position: relative;
+  left: 20%;
+  top: 3%;*/
+  font-family: 'futura';
+}
+input {
+  margin: 0px;
+  padding-top: 3px;
+}
+label {
+  margin-left: 3px;
+}
+/*--------------------------------------------------control box----------------------------------------*/
+#control {
+  padding: 5px;
+  position: absolute;
+  top: 50px;
+  left: 5px;
+  width: 182px;
+  background-color: rgba(255,255,255,0.5);
+  border-radius: 3px;
+}
+#control text {
+  fill: black;
+  font-size: 13px;
+  opacity: 0.7;
+}
+#networktitle {
+  width: 173px;
+  height: 25px;
+  text-anchor: middle;
+  font-weight: bold;
+}
+#search {
+  opacity: 0.7;
+  font-size: 13px;
+  line-height: 18px;
+}
+#check {
+  opacity: 0.7;
+  margin-top: 10px;
+  font-size: 13px;
+}
+.inactive {
+  pointer-events: none;
+}
+#slider {
+  width: 173px;
+  height: 68px;
+}
+.track,
+.track-inset,
+.track-overlay {
+  stroke-linecap: round;
+}
+
+.track {
+  stroke: #000;
+  stroke-opacity: 0.3;
+  stroke-width: 10px;
+}
+
+.track-inset {
+  stroke: #ddd;
+  stroke-width: 8px;
+}
+
+.track-overlay {
+  pointer-events: stroke;
+  stroke-width: 50px;
+  stroke: transparent;
+  cursor: crosshair;
+}
+
+.handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-opacity: 0.5;
+  stroke-width: 1.25px;
+}
+#networklegend {
+  width: 173px;
+  height: 160px;
+}
+/*-----------------------------------------------------axis----------------------------------------*/
+.axis {
+/*  fill: white;*/
+  stroke: #ffffff;
+/*  stroke-width: 2px;*/
+}
+.axis line,
+.axis path {
+  fill: none;
+  stroke: #ffffff;
+  shape-rendering: crispEdges;
+}
+.axis.string {
+  font-size: 6px;
+}
+.axis text{
+  fill: white;
+/*  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;*/
+  cursor: move;
+}
+/*-----------------------------------------------------parallel----------------------------------------*/
+#paralleltitle {
+/*  font-weight: bold;*/
+}
+#parallelchart{
+  width:100%;
+  height: 80%;
+}
+.background path {
+  fill: none;
+  stroke:   #696969;
+  shape-rendering: crispEdges;
+}
+
+.foreground path {
+  fill: none;
+}
+
+.brush .extent {
+  fill-opacity: .3;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+#Sex .tick text{
+  opacity: 0;
+}
+#Medal .tick text{
+  opacity: 0;
+}
+.liquidFillGaugeText { 
+  font-family: Helvetica; 
+  font-weight: bold; }
+
+.background_ path {
+  fill: none;
+  stroke:   #696969;
+  opacity: 0.3;
+  shape-rendering: crispEdges;
+}
+
+.foreground_ path {
+  fill: none;
+}
+/*--------------------------------------------------video----------------------------------------------*/
+#videotooltip {
+  position: absolute;
+  width: 160px;
+  height: auto;
+  padding: 10px;
+  background-color: black;
+  /*border-radius: 10px;*/
+  pointer-events: none;
+  text-align: center;
+  opacity: 0.8;
+}
+.hidden {
+  display: none;
+}
+#videotooltip p {
+  margin: 0;
+  font-family: sans-serif;
+  font-size: 12px;
+  line-height: 16px;
+  color: white;
+}
